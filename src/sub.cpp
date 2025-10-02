@@ -30,9 +30,9 @@ public:
         "/detector/img_armor", rclcpp::QoS(10).best_effort(),
         std::bind(&ImageDisplayNode::img_armor_callback, this, _1));
 
-    // 订阅 /match_draw 图像话题
+    // 订阅 /matcher/matched_cars_img 图像话题
     img_match_draw_sub_ = this->create_subscription<sensor_msgs::msg::Image>(
-        "/match_draw", rclcpp::QoS(10).best_effort(),
+        "/matcher/matched_cars_img", rclcpp::QoS(10).best_effort(),
         std::bind(&ImageDisplayNode::img_match_draw_callback, this, _1));
 
     RCLCPP_INFO(this->get_logger(),
@@ -89,7 +89,7 @@ private:
   }
 
   void img_match_draw_callback(const sensor_msgs::msg::Image::SharedPtr msg) {
-    show_image(msg, "Img Match Draw Image", 0.25);
+    show_image(msg, "Matched cars", 0.25);
   }
 };
 
