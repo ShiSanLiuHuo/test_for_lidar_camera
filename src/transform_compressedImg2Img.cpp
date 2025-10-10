@@ -38,7 +38,7 @@ private:
         auto total_end = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(
             total_end - total_start);
-        RCLCPP_INFO(this->get_logger(), "total detection time: %ld ms",
+        RCLCPP_INFO(this->get_logger(), "total transformed time: %ld ms",
                     duration.count());
       }
     } catch (const cv::Exception &e) {
