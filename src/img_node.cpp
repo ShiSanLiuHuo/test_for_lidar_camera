@@ -38,9 +38,6 @@ private:
     // 转换颜色，BGRA->RGB
     cv::cvtColor(image_, image_, cv::COLOR_BGRA2RGB);
 
-    cv::imshow("Published Image", image_);
-    cv::waitKey(1);
-
     // 转换为 ROS 图像消息
     std_msgs::msg::Header header;
     header.stamp = this->now();
@@ -49,6 +46,7 @@ private:
     auto msg = cv_bridge::CvImage(header, "rgb8", image_).toImageMsg();
 
     image_publisher_->publish(*msg);
+    RCLCPP_INFO(this->get_logger(), "Published image");
   }
 
   rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr image_publisher_;
