@@ -52,12 +52,24 @@ ament_target_dependencies(transform_node
 )
 target_link_libraries(transform_node ${OpenCV_LIBS})
 
+# 添加 img_node 可执行文件
+add_executable(img_node src/img_node.cpp)
+ament_target_dependencies(img_node
+  rclcpp
+  sensor_msgs
+  cv_bridge
+  OpenCV
+)
+target_link_libraries(transform_node ${OpenCV_LIBS})
+
+
 # 安装所有可执行文件
 install(TARGETS
   camera_node
   sub_node
   webm_camera_node
   transform_node
+  img_node
   DESTINATION lib/${PROJECT_NAME}
 )
 
