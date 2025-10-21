@@ -116,9 +116,11 @@ private:
 
     image_publisher_->publish(*msg);
 
-    RCLCPP_INFO(this->get_logger(), "Published image at (%d, %d)", roi_x_,
-                roi_y_);
+    RCLCPP_INFO(this->get_logger(), "Published image size: %d * %d",
+                image_.rows, image_.cols);
   }
+
+  std::atomic<int> frameCount{0};
 
   rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr image_publisher_;
   rclcpp::TimerBase::SharedPtr image_timer_;

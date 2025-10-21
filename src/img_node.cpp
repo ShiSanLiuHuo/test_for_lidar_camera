@@ -33,13 +33,12 @@ private:
                        std::to_string(count_) + ".png";
     img = cv::imread(path);
 
-    // 调整图像大小
-    cv::resize(img, img, cv::Size(1920, 1080));
-
     if (img.empty()) {
       RCLCPP_ERROR(this->get_logger(), "Failed to open image!");
       return;
     }
+
+    cv::resize(img, img, cv::Size(), 0.5, 0.5);
 
     // 转换颜色，BGRA->RGB
     cv::cvtColor(img, img, cv::COLOR_BGRA2RGB);

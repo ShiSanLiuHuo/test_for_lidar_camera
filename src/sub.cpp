@@ -10,35 +10,45 @@ class ImageDisplayNode : public rclcpp::Node {
 public:
   ImageDisplayNode() : Node("image_display_node") {
     using std::placeholders::_1;
-    // 订阅 /image_for_radar 图像话题
+    // 订阅 /image_ 图像话题
     raw_sub_ = this->create_subscription<sensor_msgs::msg::Image>(
         "/image_for_radar", rclcpp::QoS(10).best_effort(),
-        std::bind(&ImageDisplayNode::raw_callback, this, _1));
+        std::bind(&ImageDisplayNode::raw_callback, this, _1)); // /image_
 
-    // 订阅 /detect 图像话题
-    detect_sub_ = this->create_subscription<sensor_msgs::msg::Image>(
-        "/detector/img_detect", rclcpp::QoS(10).best_effort(),
-        std::bind(&ImageDisplayNode::detect_callback, this, _1));
+    if (only_show_raw_image_) {
+      RCLCPP_INFO(this->get_logger(), "Only showing raw image.");
+    } else {
+      // 订阅 /img_car 图像话题
+      img_car_sub_ = this->create_subscription<sensor_msgs::msg::Image>(
+          "/detector/img_car", rclcpp::QoS(10).best_effort(),
+          std::bind(&ImageDisplayNode::img_car_callback, this, _1)); // /img_
 
-    // 订阅 /img_car 图像话题
-    img_car_sub_ = this->create_subscription<sensor_msgs::msg::Image>(
-        "/detector/img_car", rclcpp::QoS(10).best_effort(),
-        std::bind(&ImageDisplayNode::img_car_callback, this, _1));
+      if (only_show_detect_image_) {
+        RCLCPP_INFO(this->get_logger(), "Only showing detect image.");
+      } else {
+        // 订阅 /detect 图像话题
+        detect_sub_ = this->create_subscription<sensor_msgs::msg::Image>(
+            "/detector/img_detect", rclcpp::QoS(10).best_effort(),
+            std::bind(&ImageDisplayNode::detect_callback, this, _1));
 
-    // 订阅 /img_armor 图像话题
-    img_armor_sub_ = this->create_subscription<sensor_msgs::msg::Image>(
-        "/detector/img_armor", rclcpp::QoS(10).best_effort(),
-        std::bind(&ImageDisplayNode::img_armor_callback, this, _1));
+        // 订阅 /img_armor 图像话题
+        img_armor_sub_ = this->create_subscription<sensor_msgs::msg::Image>(
+            "/detector/img_armor", rclcpp::QoS(10).best_effort(),
+            std::bind(&ImageDisplayNode::img_armor_callback, this, _1));
 
-    // 订阅 /matcher/matched_cars_img 图像话题
-    img_match_car_sub_ = this->create_subscription<sensor_msgs::msg::Image>(
-        "/matcher/matched_cars_img", rclcpp::QoS(10).best_effort(),
-        std::bind(&ImageDisplayNode::img_match_car_callback, this, _1));
+        // 订阅 /matcher/matched_cars_img 图像话题
+        img_match_car_sub_ = this->create_subscription<sensor_msgs::msg::Image>(
+            "/matcher/matched_cars_img", rclcpp::QoS(10).best_effort(),
+            std::bind(&ImageDisplayNode::img_match_car_callback, this, _1));
 
-    // 订阅 /match_draw 图像话题
-    img_match_draw_sub_ = this->create_subscription<sensor_msgs::msg::Image>(
-        "/match_draw", rclcpp::QoS(10).best_effort(),
-        std::bind(&ImageDisplayNode::img_match_draw_callback, this, _1));
+        // 订阅 /match_draw 图像话题
+        img_match_draw_sub_ =
+            this->create_subscription<sensor_msgs::msg::Image>(
+                "/match_draw", rclcpp::QoS(10).best_effort(),
+                std::bind(&ImageDisplayNode::img_match_draw_callback, this,
+                          _1));
+      }
+    }
 
     RCLCPP_INFO(this->get_logger(),
                 "Subscribed to /detector/img_detect and /detector/img_car");
@@ -46,11 +56,11 @@ public:
 
 private:
   void detect_callback(const sensor_msgs::msg::Image::SharedPtr msg) {
-    show_image(msg, "Detect Image", 0.5);
+    show_image(msg, "Detect Image", 0.75);
   }
 
   void img_car_callback(const sensor_msgs::msg::Image::SharedPtr msg) {
-    show_image(msg, "Img Car Image", 0.25);
+    show_image(msg, "Img  detect", 0.5);
   }
 
   void img_armor_callback(const sensor_msgs::msg::Image::SharedPtr msg) {
@@ -90,8 +100,11 @@ private:
   rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr img_match_car_sub_;
   rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr raw_sub_;
 
+  bool only_show_raw_image_{false};
+  bool only_show_detect_image_{false};
+
   void raw_callback(const sensor_msgs::msg::Image::SharedPtr msg) {
-    show_image(msg, "Raw Image", 0.5);
+    show_image(msg, "Raw Image", 0.75);
   }
 
   void img_match_draw_callback(const sensor_msgs::msg::Image::SharedPtr msg) {
